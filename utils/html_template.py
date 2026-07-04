@@ -18,8 +18,10 @@ def html_temp():
                     flex-direction: column;
                     align-items: center;
                 }
-                h1 { color: #333; text-align: center; margin-bottom: 30px; }
+                h1 { color: #333; text-align: center; margin-bottom: 10px; }
+                h2 { color: #666; text-align: center; font-size: 1.1rem; margin-bottom: 30px; font-weight: normal; }
                 
+                /* Griglia principale delle carte */
                 .memory-grid {
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -28,6 +30,7 @@ def html_temp():
                     width: 100%;
                 }
 
+                /* Stile base delle carte */
                 .card {
                     background-color: #ffffff;
                     border-radius: 12px;
@@ -40,28 +43,75 @@ def html_temp():
                     min-height: 180px;
                     cursor: pointer;
                     transition: transform 0.2s, background-color 0.3s;
+                    box-sizing: border-box;
                 }
                 .card:hover { transform: scale(1.02); }
                 
+                /* Stato Coperto (Locked) */
                 .card.locked { background-color: #3498db; color: white; }
                 .card.locked .card-content { display: none; }
                 .card.locked .card-number { font-size: 2.5rem; font-weight: bold; }
 
-                .card.active { border: 3px solid #e67e22; background-color: #fff; cursor: default; }
+                /* MODIFICA: Stato Attivo / A tutto schermo */
+                .card.active { 
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) scale(1);
+                    width: 90vw;
+                    max-width: 500px;
+                    height: auto;
+                    min-height: 450px;
+                    z-index: 9999;
+                    border: 3px solid #e67e22; 
+                    background-color: #fff; 
+                    cursor: default;
+                    padding: 25px;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                }
+                .card.active:hover { transform: translate(-50%, -50%); } /* Disabilita l'effetto hover quando è attiva */
                 .card.active .card-number { display: none; }
-                .card.active .card-content { display: flex; flex-direction: column; width: 100%; }
+                .card.active .card-content { display: flex; flex-direction: column; width: 100%; height: 100%; }
+                
+                /* Ingrandisce l'immagine quando la carta è attiva */
+                .card.active img { 
+                    max-height: 280px; 
+                    object-fit: contain; 
+                    background-color: #fafafa;
+                    margin-bottom: 15px;
+                }
 
+                /* Stato Risolto (Solved) */
                 .card.solved { border: 3px solid #2ecc71; background-color: #e8f8f5; cursor: default; }
                 .card.solved .card-number { display: none; }
                 .card.solved .card-content { display: flex; flex-direction: column; width: 100%; }
-                .card.solved input, .card.solved button { display: none; }
+                .card.solved input, .card.solved button.btn-submit, .card.solved .close-btn { display: none; }
                 .card.solved .secret-word { display: block !important; color: #27ae60; font-weight: bold; text-align: center; margin-top: 5px; }
+                .card.solved img { max-height: 110px; object-fit: cover; }
 
+                /* Elementi interni alle carte */
                 img { width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; }
-                input { width: 90%; padding: 6px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-                button { background-color: #e67e22; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-                button:hover { background-color: #d35400; }
+                input { width: 100%; padding: 10px; margin: 12px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+                
+                button.btn-submit { background-color: #e67e22; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; width: 100%; }
+                button.btn-submit:hover { background-color: #d35400; }
                 .secret-word { display: none; }
+
+                /* Bottone per chiudere la carta attiva e tornare alla griglia */
+                .close-btn {
+                    display: none;
+                    position: absolute;
+                    top: 10px;
+                    right: 15px;
+                    font-size: 1.5rem;
+                    background: none;
+                    border: none;
+                    color: #999;
+                    cursor: pointer;
+                    font-weight: bold;
+                }
+                .card.active .close-btn { display: block; }
+                .close-btn:hover { color: #333; }
             </style>
         </head>
         <body>
@@ -74,13 +124,11 @@ def html_temp():
             <script>
                 let gameData = [];
 
-                // Funzione di pulizia delle stringhe
                 function cleanString(str) {
                     if (!str) return '';
                     return str.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
                 }
 
-                // Chiamata asincrona per caricare il file JSON esterno
                 async function loadGameData() {
                     try {
                         const response = await fetch('data/game_data.json');
@@ -102,21 +150,23 @@ def html_temp():
                         card.className = `card ${savedState}`;
                         card.id = `card-${item.id}`;
 
-                        // Utilizzo delle proprietà .image e .solution mappate dal JSON
                         card.innerHTML = `
+                            <button class="close-btn" onclick="closeCard(event)">✕</button>
                             <div class="card-number">${item.id}</div>
                             <div class="card-content">
                                 <img src="${item.image}" alt="Indizio ${item.id}">
                                 <input type="text" id="input-${item.id}" placeholder="Cosa rappresenta?" autocomplete="off">
-                                <button onclick="checkAnswer(${item.id}, event)">Invia</button>
+                                <button class="btn-submit" onclick="checkAnswer(${item.id}, event)">Invia</button>
                                 <div class="secret-word">${item.solution}</div>
                             </div>
                         `;
 
                         card.addEventListener('click', () => {
                             if (card.classList.contains('locked')) {
+                                // Chiude eventuali altre carte attive prima di aprire questa
                                 document.querySelectorAll('.card.active').forEach(c => {
-                                    c.className = 'card locked';
+                                    c.classList.remove('active');
+                                    c.classList.add('locked');
                                 });
                                 card.className = 'card active';
                             }
@@ -126,12 +176,17 @@ def html_temp():
                     });
                 }
 
+                // Funzione per chiudere la modalità a schermo intero
+                function closeCard(event) {
+                    event.stopPropagation(); // Impedisce il ri-innesco del click della carta
+                    renderGrid(); // Rerenderizza la griglia ripristinando gli stati originali
+                }
+
                 function checkAnswer(id, event) {
                     event.stopPropagation();
                     const inputVal = document.getElementById(`input-${id}`).value;
                     const targetData = gameData.find(item => item.id === id);
 
-                    // Confronto eseguito usando targetData.solution
                     if (cleanString(inputVal) === cleanString(targetData.solution)) {
                         alert("La risposta è giusta! ✨\\n\\nTrovala nel crucipuzzle 😎");
                         localStorage.setItem(`card_${id}`, 'solved');
@@ -146,5 +201,4 @@ def html_temp():
         </body>
         </html>
         """
-    
     return html_template
