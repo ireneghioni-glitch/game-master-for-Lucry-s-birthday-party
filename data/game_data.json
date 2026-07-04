@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "image": "images/for_game_master/NONHAPIUSENSO.jpeg",
+        "solution": "NONHAPIUSENSO"
+    },
+    {
+        "id": 2,
+        "image": "images/for_game_master/FILI.jpeg",
+        "solution": "FILI"
+    },
+    {
+        "id": 3,
+        "image": "images/for_game_master/STAREQUI.jpeg",
+        "solution": "STAREQUI"
+    },
+    {
+        "id": 4,
+        "image": "images/for_game_master/UNEURO.jpeg",
+        "solution": "UNEURO"
+    },
+    {
+        "id": 5,
+        "image": "images/for_game_master/VERSAILTE.jpeg",
+        "solution": "VERSAILTE"
+    },
+    {
+        "id": 6,
+        "image": "images/for_game_master/I30SIFANNOSENTIRE.jpeg",
+        "solution": "I30SIFANNOSENTIRE"
+    },
+    {
+        "id": 7,
+        "image": "images/for_game_master/CHARLINO.jpeg",
+        "solution": "CHARLINO"
+    },
+    {
+        "id": 8,
+        "image": "images/for_game_master/IMMANUEL.jpeg",
+        "solution": "IMMANUEL"
+    },
+    {
+        "id": 9,
+        "image": "images/for_game_master/CASTO.jpeg",
+        "solution": "CASTO"
+    },
+    {
+        "id": 10,
+        "image": "images/for_game_master/PERMEEUGUALE.jpeg",
+        "solution": "PERMEEUGUALE"
+    },
+    {
+        "id": 11,
+        "image": "images/for_game_master/PORCODDUE.jpeg",
+        "solution": "PORCODDUE"
+    },
+    {
+        "id": 12,
+        "image": "images/for_game_master/DAIJOBU.jpeg",
+        "solution": "DAIJOBU"
+    }
+]
